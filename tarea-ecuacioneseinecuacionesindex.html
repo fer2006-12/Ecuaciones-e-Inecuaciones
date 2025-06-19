@@ -2,133 +2,57 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Resolución de Ecuaciones e Inecuaciones Cuadráticas</title>
+  <title>Dominio y Rango de una Función</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      color: #333;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #005b96;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-
-    label, input, select, button {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-
-    input, select {
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background-color: #0074d9;
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    button:hover {
-      background-color: #005fa3;
-    }
-
-    .resultado {
-      background-color: #dff0d8;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 10px;
-      color: #2c662d;
-    }
+    body { font-family: Arial; background-color: #f0f8ff; text-align: center; padding: 20px; }
+    input, button { padding: 10px; margin: 10px; font-size: 16px; }
+    #resultado { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Calculadora Cuadrática</h1>
-    <label for="a">Coeficiente a:</label>
-    <input type="number" id="a" value="1">
-    
-    <label for="b">Coeficiente b:</label>
-    <input type="number" id="b" value="0">
-    
-    <label for="c">Coeficiente c:</label>
-    <input type="number" id="c" value="-4">
-    
-    <label for="tipo">Tipo:</label>
-    <select id="tipo">
-      <option value="ecuacion">Ecuación (ax² + bx + c = 0)</option>
-      <option value="mayor">Inecuación (ax² + bx + c > 0)</option>
-      <option value="menor">Inecuación (ax² + bx + c < 0)</option>
-    </select>
 
-    <button onclick="resolver()">Resolver</button>
+  <h2>Calculadora de Dominio y Rango</h2>
 
-    <div id="resultado" class="resultado"></div>
-  </div>
+  <p>Escribe una función de x, por ejemplo: <strong>(x*x - 4)/(x - 2)</strong> o <strong>Math.sqrt(x)</strong></p>
+  
+  <input type="text" id="funcion" placeholder="Escribe f(x)" size="40">
+  <br>
+  <button onclick="calcular()">Calcular</button>
+
+  <div id="resultado"></div>
 
   <script>
-    function resolver() {
-      const a = parseFloat(document.getElementById("a").value);
-      const b = parseFloat(document.getElementById("b").value);
-      const c = parseFloat(document.getElementById("c").value);
-      const tipo = document.getElementById("tipo").value;
-      const res = document.getElementById("resultado");
+    function calcular() {
+      const fxInput = document.getElementById("funcion").value;
+      const resultado = document.getElementById("resultado");
+      let dominio = [];
+      let rango = [];
 
-      const discriminante = b*b - 4*a*c;
-      let mensaje = "";
-
-      if (tipo === "ecuacion") {
-        if (discriminante < 0) {
-          mensaje = "No tiene soluciones reales.";
-        } else {
-          const x1 = (-b + Math.sqrt(discriminante)) / (2*a);
-          const x2 = (-b - Math.sqrt(discriminante)) / (2*a);
-          mensaje = (x1 === x2)
-            ? `Tiene una raíz doble: x = ${x1.toFixed(2)}`
-            : `Las soluciones son: x₁ = ${x1.toFixed(2)}, x₂ = ${x2.toFixed(2)}`;
-        }
-      } else {
-        if (discriminante < 0) {
-          mensaje = (tipo === "mayor")
-            ? (a > 0 ? "Solución: todos los reales (ℝ)" : "Sin solución real")
-            : (a < 0 ? "Solución: todos los reales (ℝ)" : "Sin solución real");
-        } else {
-          const x1 = (-b + Math.sqrt(discriminante)) / (2*a);
-          const x2 = (-b - Math.sqrt(discriminante)) / (2*a);
-          const [min, max] = [Math.min(x1, x2), Math.max(x1, x2)];
-
-          if (tipo === "mayor") {
-            mensaje = (a > 0)
-              ? `Solución: (-∞, ${min.toFixed(2)}) ∪ (${max.toFixed(2)}, ∞)`
-              : `Solución: [${min.toFixed(2)}, ${max.toFixed(2)}]`;
-          } else {
-            mensaje = (a > 0)
-              ? `Solución: [${min.toFixed(2)}, ${max.toFixed(2)}]`
-              : `Solución: (-∞, ${min.toFixed(2)}) ∪ (${max.toFixed(2)}, ∞)`;
+      for (let x = -100; x <= 100; x += 0.5) {
+        try {
+          const f = new Function("x", "return " + fxInput + ";");
+          const y = f(x);
+          if (isFinite(y)) {
+            dominio.push(x);
+            rango.push(y);
           }
+        } catch (e) {
+          // error en función (por ejemplo división por 0)
         }
       }
 
-      res.innerHTML = mensaje;
+      const minRango = Math.min(...rango);
+      const maxRango = Math.max(...rango);
+
+      resultado.innerHTML = `
+        <h3>Resultado</h3>
+        <p><strong>Dominio (aproximado):</strong> desde ${Math.min(...dominio)} hasta ${Math.max(...dominio)}</p>
+        <p><strong>Rango (aproximado):</strong> desde ${minRango} hasta ${maxRango}</p>
+        <p><em>* Estimado evaluando de -100 a 100</em></p>
+      `;
     }
   </script>
+
 </body>
 </html>
+
